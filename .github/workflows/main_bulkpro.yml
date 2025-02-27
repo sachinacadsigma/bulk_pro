@@ -37,7 +37,7 @@ jobs:
         run: chmod +x startup.sh  # Make sure startup script has execution permission
 
       - name: Zip artifact for deployment
-        run: zip release.zip ./* -r startup.sh  # Include startup.sh explicitly
+        run: zip -r release.zip ./*  # No need to add startup.sh explicitly, it's already included
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
@@ -71,7 +71,7 @@ jobs:
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_A7099E632A84451EA32862CBEAB97D8F }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_AB7F03B97CB34A9A956D4F5DEFADBD68 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E18A2C5962D9486D81412B9BD9A37906 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E18A2C5962D9486D81412B9A37906 }}
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
