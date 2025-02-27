@@ -1,6 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy Python app to Azure Web App - bulkpro
 
 on:
@@ -13,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read # Required for actions/checkout
+      contents: read 
 
     steps:
       - uses: actions/checkout@v4
@@ -31,13 +28,18 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
         
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
+      # Optional: Run tests here (PyTest, Django test suites, etc.)
 
-      - name: Ensure startup.sh is executable
-        run: chmod +x startup.sh  # Make sure startup script has execution permission
+      - name: Ensure startup.sh exists and is executable
+        run: |
+          if [ ! -f startup.sh ]; then
+            echo "Error: startup.sh not found!"
+            exit 1
+          fi
+          chmod +x startup.sh  # Ensure it's executable
 
       - name: Zip artifact for deployment
-        run: zip -r release.zip ./*  # No need to add startup.sh explicitly, it's already included
+        run: zip -r release.zip ./*  
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
@@ -54,8 +56,8 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write # Required for requesting the JWT
-      contents: read  # Required for actions/checkout
+      id-token: write 
+      contents: read  
 
     steps:
       - name: Download artifact from build job
@@ -65,6 +67,14 @@ jobs:
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
+
+      - name: Verify startup.sh exists
+        run: |
+          if [ ! -f startup.sh ]; then
+            echo "Error: startup.sh not found after unzipping!"
+            exit 1
+          fi
+          chmod +x startup.sh  # Ensure it's executable
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -81,6 +91,4 @@ jobs:
           slot-name: 'Production'
 
       - name: Run Startup Script
-        run: |
-          chmod +x startup.sh  # Ensure it's executable
-          ./startup.sh         # Run the script explicitly
+        run: ./startup.sh
